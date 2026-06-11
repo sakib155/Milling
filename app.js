@@ -9,25 +9,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Default Data
     const defaultSourcing = [
-        { name: "Category 90", qty: 230, unit: 50, rate: 5445 },
-        { name: "Tulshi B Batch", qty: 20, unit: 50, rate: 6000 },
-        { name: "Tulshi A Batch", qty: 183, unit: 52.8, rate: 6795 },
-        { name: "Loose Stock", qty: 138, unit: 1, rate: 100, isFixed: true }
+        { name: "Loose Stock", qty: 0, unit: 1, rate: 0, isFixed: true }
     ];
 
     const defaultOpex = [
-        { name: "Crushing Bill", amount: 28250 },
-        { name: "Chala Bill", amount: 9600 },
-        { name: "Flavour", amount: 7000 },
-        { name: "Vehicle (Transport)", amount: 4130 }
+        { name: "Crushing Bill", amount: 0 },
+        { name: "Chala Bill", amount: 0 },
+        { name: "Flavour", amount: 0 },
+        { name: "Vehicle (Transport)", amount: 0 }
     ];
 
     const defaultByproducts = [
-        { name: "Khud", qty: 625, unit: 50, rate: 1500 },
-        { name: "Mora", qty: 235, unit: 50, rate: 1300 },
-        { name: "Mota", qty: 246, unit: 50, rate: 3000 },
-        { name: "Grader", qty: 263, unit: 50, rate: 6000 },
-        { name: "Loose Stock", qty: 56, unit: 50, rate: 5000 }
+        { name: "Khud", qty: 0, unit: 50, rate: 0 },
+        { name: "Mora", qty: 0, unit: 50, rate: 0 },
+        { name: "Mota", qty: 0, unit: 50, rate: 0 },
+        { name: "Grader", qty: 0, unit: 50, rate: 0 },
+        { name: "Loose Stock", qty: 0, unit: 50, rate: 0 }
     ];
 
     // Global Settings elements

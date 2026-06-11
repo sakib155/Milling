@@ -713,3 +713,223 @@ footer {
     background: var(--primary-hover);
     box-shadow: 0 0 12px var(--primary-glow);
 }
+
+/* =====================================================
+   RESPONSIVE DESIGN
+   ===================================================== */
+
+/* Tablet (≤ 1024px) */
+@media (max-width: 1024px) {
+    body {
+        padding: 1.25rem;
+    }
+
+    .container {
+        max-width: 100%;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .brand-section h1 {
+        font-size: 1.75rem;
+    }
+
+    .settings-bar {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: flex-start;
+    }
+
+    .hero-price {
+        font-size: 2rem;
+    }
+
+    .hero-stat-value {
+        font-size: 1.4rem;
+    }
+
+    .visual-panel {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile (≤ 768px) */
+@media (max-width: 768px) {
+    body {
+        padding: 0.75rem;
+    }
+
+    header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+    }
+
+    .brand-section h1 {
+        font-size: 1.45rem;
+    }
+
+    .brand-section p {
+        font-size: 0.85rem;
+    }
+
+    .badge-container {
+        font-size: 0.78rem;
+        padding: 0.4rem 0.75rem;
+    }
+
+    .settings-bar {
+        font-size: 0.8rem;
+        gap: 0.6rem;
+        margin-bottom: 1rem;
+    }
+
+    .card {
+        padding: 1.25rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    /* Hero metrics stack vertically on mobile */
+    .hero-result-card {
+        padding: 1.25rem;
+    }
+
+    .hero-layout {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .hero-layout > div:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .hero-price {
+        font-size: 1.75rem;
+    }
+
+    .hero-stat-value {
+        font-size: 1.25rem;
+    }
+
+    .hero-stat-label {
+        font-size: 0.7rem;
+    }
+
+    /* KPI cards: 2 columns on tablet, 1 on small */
+    .kpi-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .kpi-value {
+        font-size: 1.2rem;
+    }
+
+    /* Mass balance grid */
+    div[style*="grid-template-columns: repeat(3, 1fr)"] {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 1rem !important;
+    }
+
+    /* Table horizontal scroll */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        min-width: 480px;
+    }
+
+    /* Row inputs stack on mobile */
+    .row-inputs.sourcing-row,
+    .row-inputs.byproduct-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding-bottom: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .row-inputs.sourcing-row .btn-icon,
+    .row-inputs.byproduct-row .btn-icon {
+        grid-column: 1 / -1;
+        width: 100%;
+        height: 36px;
+    }
+
+    .row-inputs.opex-row {
+        grid-template-columns: 1fr 1fr 38px;
+    }
+
+    .row-inputs.two-cols {
+        grid-template-columns: 1fr;
+    }
+
+    /* History modal */
+    #save-batch-modal > div {
+        padding: 1.5rem !important;
+        margin: 1rem !important;
+        width: calc(100% - 2rem) !important;
+    }
+
+    /* History list */
+    #history-list {
+        max-height: 250px !important;
+    }
+
+    footer {
+        margin-top: 2.5rem;
+    }
+}
+
+/* Extra small (≤ 480px) */
+@media (max-width: 480px) {
+    body {
+        padding: 0.5rem;
+    }
+
+    .brand-section h1 {
+        font-size: 1.2rem;
+    }
+
+    .hero-layout {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .hero-price {
+        font-size: 1.6rem;
+    }
+
+    .hero-stat-value {
+        font-size: 1.1rem;
+    }
+
+    .kpi-row {
+        grid-template-columns: 1fr;
+    }
+
+    .row-inputs.sourcing-row,
+    .row-inputs.byproduct-row,
+    .row-inputs.opex-row {
+        grid-template-columns: 1fr;
+    }
+
+    .row-inputs.sourcing-row .btn-icon,
+    .row-inputs.byproduct-row .btn-icon,
+    .row-inputs.opex-row .btn-icon {
+        width: 100%;
+        height: 36px;
+    }
+
+    div[style*="grid-template-columns: repeat(3, 1fr)"] {
+        grid-template-columns: 1fr !important;
+    }
+}
