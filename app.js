@@ -1,6 +1,12 @@
 // Rice Milling Cost Calculator Logic - Fully Dynamic
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // ---- Supabase init ----
+    const SUPABASE_URL = 'https://xrzamnslojmzwpvqdejy.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhyemFtbnNsb2ptendwdnFkZWp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNjAzMjIsImV4cCI6MjA5NjczNjMyMn0.hvtwxOxhFCGcjetj7vQwm5WKx60vuvSfJYL6r72gEUo';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ---- End Supabase init ----
+
     // Default Data
     const defaultSourcing = [
         { name: "Category 90", qty: 230, unit: 50, rate: 5445 },
@@ -635,10 +641,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBatchBtn = document.getElementById('save-batch-btn');
     const historyListContainer = document.getElementById('history-list');
 
-    function renderHistory() {
+    async function renderHistory() {
         let history = [];
         try {
-            history = JSON.parse(localStorage.getItem('milling_batch_history')) || [];
+            const device = bagWeightSelect.value;
+            const { data: historyData, error: loadErr } = await supabase
+                .from('batch_history')
+                .select('id, batch_data')
+                .eq('device', device)
+                .order('created_at', { ascending: false });
+            if (loadErr) console.error('Supabase load error:', loadErr);
+            history = (historyData || []).map(row => ({ id: row.id, ...row.batch_data }));
         } catch (e) {
             history = [];
         }
@@ -748,17 +761,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const detailsBtn = item.querySelector('.details-btn');
             const detailsDiv = item.querySelector('.batch-details');
-            detailsBtn.addEventListener('click', () => {
+            detailsBtn.addEventListener('click', async () => {
                 const isHidden = detailsDiv.style.display === 'none';
                 detailsDiv.style.display = isHidden ? 'block' : 'none';
                 detailsBtn.textContent = isHidden ? 'Hide' : 'Details';
+                // Persist expanded state if needed (optional)
+                // No extra action required for Supabase here
                 detailsBtn.style.background = isHidden ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.1)';
             });
 
-            item.querySelector('.del-btn').addEventListener('click', () => {
+            item.querySelector('.del-btn').addEventListener('click', async () => {
                 if (confirm(`Are you sure you want to delete "${batch.name}" from history?`)) {
                     let updatedHistory = history.filter(b => b.id !== batch.id);
-                    localStorage.setItem('milling_batch_history', JSON.stringify(updatedHistory));
+                const { error: delErr } = await supabase.from('batch_history').delete().eq('id', batch.id);
+                if (delErr) console.error('Supabase delete error:', delErr);
+                    await supabase.from('batch_history').insert({
+            device: currentDevice,
+            batch_data: updatedHistory.find(b => b.id === batch.id)
+        });
                     renderHistory();
                 }
             });
@@ -768,6 +788,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const saveBatchModal = document.getElementById('save-batch-modal');
+    // Re‑load history when device (bag weight) changes
+    bagWeightSelect.addEventListener('change', async () => {
+        currentDevice = bagWeightSelect.value;
+        const { data: newData, error: changeErr } = await supabase
+            .from('batch_history')
+            .select('id, batch_data')
+            .eq('device', currentDevice)
+            .order('created_at', { ascending: false });
+        if (changeErr) console.error('Supabase device change error:', changeErr);
+        history = (newData || []).map(row => ({ id: row.id, ...row.batch_data }));
+        renderHistory();
+    });
     const batchNameInput = document.getElementById('batch-name-input');
     const confirmSaveBtn = document.getElementById('confirm-save-btn');
     const cancelSaveBtn = document.getElementById('cancel-save-btn');
@@ -783,7 +815,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveBatchModal.style.display = 'none';
     }
 
-    function saveCurrentBatch() {
+    async function saveCurrentBatch() {
         const batchName = batchNameInput.value.trim() || "Unnamed Batch";
         closeSaveModal();
 
@@ -843,14 +875,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        let history = [];
-        try {
-            history = JSON.parse(localStorage.getItem('milling_batch_history')) || [];
-        } catch (e) {
-            history = [];
+        // Insert new batch into Supabase
+        const { error: saveErr } = await supabase
+            .from('batch_history')
+            .insert({ device: bagWeightSelect.value, batch_data: newBatch });
+        if (saveErr) {
+            console.error('Supabase save error:', saveErr);
+            alert('Failed to save batch. Check the console for details.');
         }
-        history.unshift(newBatch); // add to beginning
-        localStorage.setItem('milling_batch_history', JSON.stringify(history));
         renderHistory();
     }
 
