@@ -33,8 +33,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const finalCostPerBagSub = document.getElementById('final-cost-per-bag-sub');
 
     // Main Product Output elements
-    const prodBags = document.getElementById('prod-bags');
-    const prodKg = document.getElementById('prod-kg');
+    const prodQty = document.getElementById('prod-qty');
+    const prodUnit = document.getElementById('prod-unit');
+    const prodRate = document.getElementById('prod-rate');
+    const prodRateLabel = document.getElementById('prod-rate-label');
 
     // Output elements
     const finalRiceCostEl = document.getElementById('final-rice-cost');
@@ -202,15 +204,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <input type="text" class="byprod-name" value="${name}" placeholder="e.g. Khud">
             </div>
             <div class="input-group">
-                <label>Qty (KG)</label>
-                <input type="number" class="byprod-qty" value="${qty}" step="any" placeholder="Qty (KG)">
+                <label>Qty (Units)</label>
+                <input type="number" class="byprod-qty" value="${qty}" step="any" placeholder="Qty (Units)">
             </div>
             <div class="input-group">
                 <label>Unit Size (KG)</label>
                 <input type="number" class="byprod-unit" value="${unitSize}" step="any" placeholder="Unit Size (KG)">
             </div>
             <div class="input-group">
-                <label class="byprod-rate-label">Price / Unit</label>
+                <label class="byprod-rate-label">Price / 50kg</label>
                 <div class="input-wrapper">
                     <span class="input-prefix">৳</span>
                     <input type="number" class="has-prefix byprod-rate" value="${rate}" step="any" placeholder="Price">
@@ -227,8 +229,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rateLabel = row.querySelector('.byprod-rate-label');
 
         const updateLabels = () => {
-            const size = parseFloat(unitInput.value) || 0;
-            rateLabel.textContent = `Price / Unit (${size}kg)`;
+            rateLabel.textContent = `Price / 50kg`;
         };
 
         unitInput.addEventListener('input', () => {
@@ -316,12 +317,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         byproductRows.forEach(row => {
             const name = row.querySelector('.byprod-name').value || 'Unnamed By-Product';
-            const qtyKg = parseFloat(row.querySelector('.byprod-qty').value) || 0;
+            const qtyUnits = parseFloat(row.querySelector('.byprod-qty').value) || 0;
             const unitSize = parseFloat(row.querySelector('.byprod-unit').value) || 1.0;
             const rate = parseFloat(row.querySelector('.byprod-rate').value) || 0;
 
-            const qtyUnits = qtyKg / unitSize;
-            const total = qtyUnits * rate;
+            const qtyKg = qtyUnits * unitSize;
+            const total = (qtyKg / 50) * rate;
             totalByproductRevenue += total;
             totalByproductKg += qtyKg;
 
@@ -336,8 +337,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // 4. Main Product Yield details
-        const mainBags = parseFloat(prodBags.value) || 0;
-        const mainKg = parseFloat(prodKg.value) || 0;
+        const mainQty = parseFloat(prodQty.value) || 0;
+        const mainUnit = parseFloat(prodUnit.value) || 0;
+        const mainKg = mainQty * mainUnit;
+        const mainBags = mainKg / bagWeight;
 
         // Gross and Net Costs
         const grossCost = totalSourcingCost + totalOperationalCost;
@@ -567,6 +570,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
+        // Update main product unit if it matches old weight
+        if (parseFloat(prodUnit.value) === currentBagWeight) {
+            prodUnit.value = newBagWeight;
+            if (prodRateLabel) {
+                prodRateLabel.textContent = `Rate / Unit (${newBagWeight}kg)`;
+            }
+        }
+
         currentBagWeight = newBagWeight;
         calculate();
     });
@@ -592,14 +603,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Hook Main Product Outputs
-    prodBags.addEventListener('input', () => {
-        // Automatically calculate KG based on bag weight as a helper, but allow manual overwrite
-        const bagWeight = parseFloat(bagWeightSelect.value) || 50.0;
-        const bags = parseFloat(prodBags.value) || 0;
-        prodKg.value = bags * bagWeight;
+    prodQty.addEventListener('input', calculate);
+    prodUnit.addEventListener('input', () => {
+        const unit = parseFloat(prodUnit.value) || 0;
+        if (prodRateLabel) {
+            prodRateLabel.textContent = `Rate / Unit (${unit}kg)`;
+        }
         calculate();
     });
-    prodKg.addEventListener('input', calculate);
+    if (prodRate) {
+        prodRate.addEventListener('input', calculate);
+    }
 
     // Add row button actions
     addSourcingBtn.addEventListener('click', () => {
@@ -648,7 +662,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .eq('device', device)
                 .order('created_at', { ascending: false });
             if (loadErr) console.error('Supabase load error:', loadErr);
-            history = (historyData || []).map(row => ({ id: row.id, ...row.batch_data }));
+            history = (historyData || []).map(row => ({ ...row.batch_data, id: row.id }));
         } catch (e) {
             history = [];
         }
@@ -698,9 +712,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             let byproductLines = '';
             if (batch.byproducts && batch.byproducts.length > 0) {
                 byproductLines = batch.byproducts.map(it => {
-                    const qtyUnits = it.qty / (it.unit || 1);
-                    const total = qtyUnits * it.rate;
-                    return `<li style="margin-left: 0.8rem; list-style-type: disc; margin-bottom: 0.15rem;">${it.name}: ${formatNumber(it.qty, 1)} kg (${formatNumber(qtyUnits, 2)} x ${it.unit} kg) @ ৳${formatNumber(it.rate, 2)} (৳${formatNumber(total, 2)})</li>`;
+                    const qtyUnits = it.qty;
+                    const qtyKg = qtyUnits * (it.unit || 1);
+                    const total = (qtyKg / 50) * it.rate;
+                    return `<li style="margin-left: 0.8rem; list-style-type: disc; margin-bottom: 0.15rem;">${it.name}: ${formatNumber(qtyKg, 1)} kg (${formatNumber(qtyUnits, 2)} x ${it.unit} kg) @ ৳${formatNumber(it.rate, 2)} (৳${formatNumber(total, 2)})</li>`;
                 }).join('');
             } else {
                 byproductLines = '<li style="margin-left: 0.8rem; list-style-type: none; color: var(--text-muted);">None</li>';
@@ -729,7 +744,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <strong style="color: #a5b4fc;">Configs & Metadata</strong><br>
                         • Standard Bag Weight: ${batch.bagWeight} kg<br>
                         • By-product "Loose Stock" unit: ${batch.looseStockByproductUnitChecked ? `${batch.bagWeight} kg` : '1 kg'}<br>
-                        • Main Output: ${formatNumber(batch.mainProduct ? batch.mainProduct.bags : 0, 0)} bags (${formatNumber(batch.mainProduct ? batch.mainProduct.kg : 0, 1)} kg)
+                        • Main Output: ${formatNumber(batch.mainProduct ? batch.mainProduct.qty : 0, 1)} units x ${formatNumber(batch.mainProduct ? batch.mainProduct.unit : 50, 1)}kg (${formatNumber(batch.mainProduct ? batch.mainProduct.kg : 0, 1)} kg)
                     </div>
                     <div style="margin-bottom: 0.5rem;">
                         <strong style="color: #60a5fa;">Sourcing Raw Materials</strong>
@@ -769,14 +784,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             item.querySelector('.del-btn').addEventListener('click', async () => {
                 if (confirm(`Are you sure you want to delete "${batch.name}" from history?`)) {
-                    let updatedHistory = history.filter(b => b.id !== batch.id);
-                const { error: delErr } = await supabase.from('batch_history').delete().eq('id', batch.id);
-                if (delErr) console.error('Supabase delete error:', delErr);
-                    await supabase.from('batch_history').insert({
-            device: currentDevice,
-            batch_data: updatedHistory.find(b => b.id === batch.id)
-        });
-                    renderHistory();
+                    const { error: delErr } = await supabase.from('batch_history').delete().eq('id', batch.id);
+                    if (delErr) {
+                        console.error('Supabase delete error:', delErr);
+                        alert('Failed to delete the batch.');
+                    } else {
+                        renderHistory();
+                    }
                 }
             });
 
@@ -860,8 +874,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             sourcing,
             opex,
             mainProduct: {
-                bags: parseFloat(prodBags.value) || 0,
-                kg: parseFloat(prodKg.value) || 0
+                qty: parseFloat(prodQty.value) || 0,
+                unit: parseFloat(prodUnit.value) || 0,
+                rate: prodRate ? (parseFloat(prodRate.value) || 0) : 0,
+                kg: (parseFloat(prodQty.value) || 0) * (parseFloat(prodUnit.value) || 0)
             },
             byproducts,
             summary: {
@@ -901,9 +917,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             opexContainer.appendChild(createOpexRow(item.name, item.amount));
         });
 
-        // 4. Set main product outputs
-        prodBags.value = batch.mainProduct.bags;
-        prodKg.value = batch.mainProduct.kg;
+        // Main Product
+        if (batch.mainProduct) {
+            prodQty.value = batch.mainProduct.qty !== undefined ? batch.mainProduct.qty : (batch.mainProduct.bags || 0);
+            prodUnit.value = batch.mainProduct.unit || batch.bagWeight || 50;
+            if (prodRate) prodRate.value = batch.mainProduct.rate || 0;
+            if (prodRateLabel) prodRateLabel.textContent = `Rate / Unit (${prodUnit.value}kg)`;
+        }
 
         // 5. Clear and rebuild byproducts
         byproductContainer.innerHTML = '';
@@ -931,4 +951,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Perform first run calculation
     calculate();
+
+    // PDF Download Logic
+    const downloadPdfBtn = document.getElementById('download-pdf-btn');
+    if (downloadPdfBtn) {
+        downloadPdfBtn.addEventListener('click', () => {
+            const body = document.body;
+            body.classList.add('pdf-export');
+            
+            // Allow DOM to update styles
+            setTimeout(() => {
+                const opt = {
+                    margin:       0.2,
+                    filename:     `Milling-Report-${new Date().toISOString().split('T')[0]}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true },
+                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+                };
+                
+                html2pdf().set(opt).from(body).save().then(() => {
+                    body.classList.remove('pdf-export');
+                }).catch(err => {
+                    console.error('PDF generation error:', err);
+                    body.classList.remove('pdf-export');
+                });
+            }, 100);
+        });
+    }
 });

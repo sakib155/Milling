@@ -52,9 +52,11 @@ def run_interactive():
         
     # 3. Production Output
     print("\n--- 3. Enter Main Product Output (Rice) ---")
-    main_bags = get_float_input("Main Rice Output (Bags): ")
-    main_kg = get_float_input(f"Weight (KG) [default: {main_bags * bag_weight}]: ", default=main_bags * bag_weight)
-    main_product = {"name": "Rice", "bags": main_bags, "kg": main_kg}
+    main_qty = get_float_input("Quantity: ")
+    main_unit = get_float_input(f"Unit Size in KG [default: {bag_weight}]: ", default=bag_weight)
+    main_rate = get_float_input(f"Rate per Unit (size: {main_unit} kg) [optional]: ", default=0.0)
+    main_kg = main_qty * main_unit
+    main_product = {"name": "Rice", "qty": main_qty, "unit": main_unit, "kg": main_kg, "bags": main_kg / bag_weight if bag_weight > 0 else 0, "rate": main_rate}
     
     # 4. By-products
     by_product_rates = {}
@@ -63,11 +65,11 @@ def run_interactive():
         name = input("By-product Name (or press Enter to finish): ").strip()
         if not name:
             break
-        qty_kg = get_float_input(f"Quantity (KG) for {name}: ")
+        qty_units = get_float_input(f"Quantity (Units) for {name}: ")
         unit_size = get_float_input(f"Unit Size in KG for {name} [default: {bag_weight}]: ", default=bag_weight)
-        rate = get_float_input(f"Price per Unit (size: {unit_size} kg): ")
+        rate = get_float_input(f"Price per 50 KG (for {name}): ")
         
-        by_product_rates[name] = {"kg": qty_kg, "unit_size": unit_size, "rate": rate}
+        by_product_rates[name] = {"qty_units": qty_units, "unit_size": unit_size, "rate": rate}
         
     calculate_and_print(bag_weight, sourcing_items, operational_expenses, main_product, by_product_rates)
 
@@ -102,12 +104,12 @@ def calculate_and_print(bag_weight, sourcing_items, operational_expenses, main_p
     by_product_revenues = {}
     total_byproduct_kg = 0
     for name, info in by_product_rates.items():
-        qty_kg = info["kg"]
+        qty_units = info.get("qty_units", info.get("kg", 0) / info.get("unit_size", 1))
         unit_size = info["unit_size"]
         rate = info["rate"]
         
-        qty_units = qty_kg / unit_size
-        revenue = qty_units * rate
+        qty_kg = qty_units * unit_size
+        revenue = (qty_kg / 50.0) * rate
         total_byproduct_kg += qty_kg
         
         by_product_revenues[name] = {
@@ -157,7 +159,7 @@ def calculate_and_print(bag_weight, sourcing_items, operational_expenses, main_p
     print(f"  {'Gross Cost (Sourcing + Opex)':<30}: TK {total_sourcing_cost + total_operational_cost:,.2f}")
     print(f"  {'By-product Offsets':<30}: -TK {total_by_product_revenue:,.2f}")
     print(f"  {'Final Net Cost of Rice':<30}: TK {final_cost_main_product:,.2f}")
-    print(f"  {'Main Rice Quantity':<30}: {main_product['bags']:.0f} bags ({main_product['kg']:,} kg)")
+    print(f"  {'Main Rice Quantity':<30}: {main_product['qty']:.1f} units x {main_product['unit']:.1f} kg ({main_product['kg']:,} kg)")
     print(f"  {'Total Input Sourcing Qty':<30}: {total_input_kg:,.1f} kg")
     print(f"  {'Total Output Qty':<30}: {total_output_kg:,.1f} kg (Rice: {main_product['kg']:,.1f} kg + By-products: {total_byproduct_kg:,.1f} kg)")
     print(f"  {'Process Recovery Ratio':<30}: {recovery_pct:.2f}%")
@@ -188,11 +190,12 @@ def calculate_and_print(bag_weight, sourcing_items, operational_expenses, main_p
             log_entry += f"    - {name:<23} : TK {amount:,.2f}\n"
         log_entry += f"  [By-products Recovery]\n"
         for name, info in by_product_rates.items():
-            qty_units = info["kg"] / info["unit_size"]
-            revenue = qty_units * info["rate"]
-            log_entry += f"    - {name:<23} : {info['kg']:.1f} kg ({qty_units:.2f} x {info['unit_size']:.1f} kg) @ TK {info['rate']:,.2f} (-TK {revenue:,.2f})\n"
+            qty_units = info.get("qty_units", info.get("kg", 0) / info.get("unit_size", 1))
+            qty_kg = qty_units * info["unit_size"]
+            revenue = (qty_kg / 50.0) * info["rate"]
+            log_entry += f"    - {name:<23} : {qty_kg:.1f} kg ({qty_units:.2f} x {info['unit_size']:.1f} kg) @ TK {info['rate']:,.2f} (-TK {revenue:,.2f})\n"
         log_entry += f"  [Main Product Output]\n"
-        log_entry += f"    - Rice                  : {main_product['bags']:.0f} bags ({main_product['kg']:,} kg)\n"
+        log_entry += f"    - Rice                  : {main_product.get('qty', 0):.1f} units x {main_product.get('unit', 50):.1f} kg ({main_product['kg']:,} kg)\n"
         log_entry += f"  [Process Yield & Costs Summary]\n"
         log_entry += f"    Total Input Sourcing Qty: {total_input_kg:,.1f} kg\n"
         log_entry += f"    Total Output Qty        : {total_output_kg:,.1f} kg\n"
@@ -225,14 +228,14 @@ def run_default():
         "Vehicle (Transport)": 4130
     }
     
-    main_product = {"name": "Rice", "bags": 417, "kg": 20850}
+    main_product = {"name": "Rice", "qty": 0, "unit": 50, "kg": 0, "bags": 0, "rate": 0}
     
     by_product_rates = {
-        "Khud": {"kg": 625.0, "unit_size": 50.0, "rate": 1500.0},
-        "Mora": {"kg": 235.0, "unit_size": 50.0, "rate": 1300.0},
-        "Mota": {"kg": 246.0, "unit_size": 50.0, "rate": 3000.0},
-        "Grader": {"kg": 263.0, "unit_size": 50.0, "rate": 6000.0},
-        "Loose Stock": {"kg": 56.0, "unit_size": 50.0, "rate": 5000.0}
+        "Khud": {"qty_units": 0, "unit_size": 50.0, "rate": 0},
+        "Mora": {"qty_units": 0, "unit_size": 50.0, "rate": 0},
+        "Mota": {"qty_units": 0, "unit_size": 50.0, "rate": 0},
+        "Grader": {"qty_units": 0, "unit_size": 50.0, "rate": 0},
+        "Loose Stock": {"qty_units": 0, "unit_size": 50.0, "rate": 0}
     }
     
     calculate_and_print(bag_weight, sourcing_items, operational_expenses, main_product, by_product_rates)

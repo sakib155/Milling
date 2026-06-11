@@ -933,3 +933,195 @@ footer {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* =====================================================
+   PRINT / PDF EXPORT STYLES (BLACK & WHITE)
+   ===================================================== */
+@media print {
+    @page {
+        margin: 0.5cm;
+        size: auto;
+    }
+
+    body {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background-image: none !important;
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+    }
+
+    * {
+        color: #000 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        border-color: #000 !important;
+    }
+
+    /* Hide UI controls and unneeded areas for the report */
+    .settings-bar,
+    header button,
+    .btn-action-container,
+    .dashboard-grid > div:first-child, /* The entire left input forms column */
+    #history-panel,
+    footer,
+    #save-batch-modal {
+        display: none !important;
+    }
+
+    /* Reformat layout for print */
+    .dashboard-grid {
+        display: block !important;
+    }
+
+    /* Expand the results container to full width */
+    .dashboard-grid > div:last-child {
+        width: 100% !important;
+        display: block !important;
+    }
+
+    .card {
+        border: none !important;
+        padding: 0 !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .card-title {
+        font-size: 14px !important;
+        margin-bottom: 0.5rem !important;
+        padding-bottom: 0.25rem !important;
+    }
+
+    /* Print tables clearly */
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+    }
+
+    th, td {
+        border: 1px solid #000 !important;
+        padding: 4px 6px !important;
+        color: #000 !important;
+        font-size: 10px !important;
+    }
+
+    th {
+        background: #f0f0f0 !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .hero-result-card {
+        border: 2px solid #000 !important;
+        padding: 0.75rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .hero-layout {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+    }
+
+    .hero-divider {
+        display: none !important;
+    }
+
+    .hero-price {
+        font-size: 18px !important;
+    }
+
+    .hero-stat-value {
+        font-size: 14px !important;
+    }
+
+    .kpi-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .kpi-card {
+        border: 1px solid #000 !important;
+        flex: 1 !important;
+        padding: 0.5rem !important;
+    }
+
+    .kpi-card::after {
+        display: none !important;
+    }
+
+    .kpi-value {
+        font-size: 14px !important;
+    }
+
+    .kpi-label {
+        font-size: 9px !important;
+        margin-bottom: 0.25rem !important;
+    }
+
+    /* Prevent page breaks inside cards */
+    .card, .hero-result-card, .kpi-card, table, tr {
+        page-break-inside: avoid !important;
+    }
+
+    /* Improve header look for print */
+    header {
+        border-bottom: 2px solid #000 !important;
+        margin-bottom: 0.75rem !important;
+        padding-bottom: 0.5rem !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+
+    .brand-section h1 {
+        font-size: 16px !important;
+        margin-bottom: 0 !important;
+    }
+
+    .brand-section p {
+        font-size: 10px !important;
+        margin-top: 0 !important;
+    }
+
+    .badge-container {
+        border: 1px solid #000 !important;
+        padding: 0.25rem 0.5rem !important;
+        font-size: 9px !important;
+    }
+}
+
+/* =====================================================
+   JS PDF EXPORT STYLES (CLONED FROM PRINT)
+   ===================================================== */
+body.pdf-export {
+    background: #fff !important; color: #000 !important; padding: 0.5cm !important; margin: 0 !important; background-image: none !important; font-size: 11px !important; line-height: 1.2 !important;
+}
+.pdf-export * { color: #000 !important; background: transparent !important; box-shadow: none !important; text-shadow: none !important; border-color: #000 !important; }
+.pdf-export .settings-bar, .pdf-export header button, .pdf-export .btn-action-container, .pdf-export .dashboard-grid > div:first-child, .pdf-export #history-panel, .pdf-export footer, .pdf-export #save-batch-modal { display: none !important; }
+.pdf-export .dashboard-grid { display: block !important; }
+.pdf-export .dashboard-grid > div:last-child { width: 100% !important; display: block !important; }
+.pdf-export .card { border: none !important; padding: 0 !important; margin-bottom: 0.5rem !important; }
+.pdf-export .card-title { font-size: 14px !important; margin-bottom: 0.5rem !important; padding-bottom: 0.25rem !important; }
+.pdf-export table { border-collapse: collapse !important; width: 100% !important; }
+.pdf-export th, .pdf-export td { border: 1px solid #000 !important; padding: 4px 6px !important; color: #000 !important; font-size: 10px !important; }
+.pdf-export th { background: #f0f0f0 !important; }
+.pdf-export .hero-result-card { border: 2px solid #000 !important; padding: 0.75rem !important; margin-bottom: 0.75rem !important; }
+.pdf-export .hero-layout { display: flex !important; justify-content: space-between !important; align-items: center !important; flex-wrap: wrap !important; }
+.pdf-export .hero-divider { display: none !important; }
+.pdf-export .hero-price { font-size: 18px !important; }
+.pdf-export .hero-stat-value { font-size: 14px !important; }
+.pdf-export .kpi-row { display: flex !important; justify-content: space-between !important; gap: 0.5rem !important; margin-bottom: 0.75rem !important; }
+.pdf-export .kpi-card { border: 1px solid #000 !important; flex: 1 !important; padding: 0.5rem !important; }
+.pdf-export .kpi-card::after { display: none !important; }
+.pdf-export .kpi-value { font-size: 14px !important; }
+.pdf-export .kpi-label { font-size: 9px !important; margin-bottom: 0.25rem !important; }
+.pdf-export header { border-bottom: 2px solid #000 !important; margin-bottom: 0.75rem !important; padding-bottom: 0.5rem !important; display: flex !important; justify-content: space-between !important; align-items: center !important; }
+.pdf-export .brand-section h1 { font-size: 16px !important; margin-bottom: 0 !important; }
+.pdf-export .brand-section p { font-size: 10px !important; margin-top: 0 !important; }
+.pdf-export .badge-container { border: 1px solid #000 !important; padding: 0.25rem 0.5rem !important; font-size: 9px !important; }
