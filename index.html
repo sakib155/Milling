@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rice Milling Cost & Yield Analysis Dashboard</title>
+    <meta name="description" content="Calculate and analyze raw material sourcing costs, operational milling expenses, by-product sales, and the final production cost per bag & kg for rice milling mills.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Settings Header (Top Utility Bar) -->
+        <div class="settings-bar">
+            <div class="setting-item">
+                <label for="bag-weight-config">
+                    <span>Standard Bag Weight:</span>
+                    <select id="bag-weight-config">
+                        <option value="50" selected>50 kg</option>
+                        <option value="40">40 kg</option>
+                        <option value="60">60 kg</option>
+                        <option value="100">100 kg</option>
+                    </select>
+                </label>
+            </div>
+            <div class="setting-item">
+                <label for="loose-stock-byproduct-unit">
+                    <input type="checkbox" id="loose-stock-byproduct-unit" checked>
+                    <span>By-product "Loose Stock" unit is 1 Bag (50kg)</span>
+                </label>
+            </div>
+        </div>
+
+        <header>
+            <div class="brand-section">
+                <h1 id="main-heading">Milling Cost & Yield Analyzer</h1>
+                <p>Advanced batch costing and revenue offset calculator for rice milling operations</p>
+            </div>
+            <div class="badge-container">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                </svg>
+                <span>Interactive Yield Report</span>
+            </div>
+        </header>
+
+        <main class="dashboard-grid">
+            <div class="left-column-wrapper" style="display: flex; flex-direction: column; gap: 2rem;">
+                <!-- Left Column: Inputs Form -->
+                <section class="card" aria-labelledby="inputs-section-title">
+                    <h2 class="card-title" id="inputs-section-title">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        Operational Inputs
+                    </h2>
+
+                    <!-- Sourcing Parameters -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">1. Sourcing Data</h3>
+                        <div class="input-grid" id="sourcing-list">
+                            <!-- Generated Dynamically -->
+                        </div>
+                        <button type="button" class="btn-add" id="add-sourcing-btn">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Sourcing Item
+                        </button>
+                    </div>
+
+                    <!-- Operational Expenses -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">2. Operational Expenses</h3>
+                        <div class="input-grid" id="opex-list">
+                            <!-- Generated Dynamically -->
+                        </div>
+                        <button type="button" class="btn-add" id="add-opex-btn">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Operational Expense
+                        </button>
+                    </div>
+
+                    <!-- Yield/Production Output -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">3. Production Output (Main Rice)</h3>
+                        <div class="row-inputs two-cols">
+                            <div class="input-group">
+                                <label for="prod-bags">Main Product Output (Bags)</label>
+                                <input type="number" id="prod-bags" value="417" step="any">
+                            </div>
+                            <div class="input-group">
+                                <label for="prod-kg">Weight (KG)</label>
+                                <input type="number" id="prod-kg" value="20850" step="any">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- By-Products Rates and Output -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">4. By-Products Quantity & Sales Rates</h3>
+                        <div class="input-grid" id="byproduct-list">
+                            <!-- Generated Dynamically -->
+                        </div>
+                        <button type="button" class="btn-add" id="add-byproduct-btn">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add By-Product
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Batch History Card -->
+                <section class="card" id="history-section" style="margin-top: 0;">
+                    <h2 class="card-title">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Batch History
+                    </h2>
+                    <div class="btn-action-container" style="margin-top: 0; margin-bottom: 1rem;">
+                        <button type="button" class="btn-primary" id="save-batch-btn" style="width: 100%;">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                            </svg>
+                            Save Current Batch
+                        </button>
+                    </div>
+                    <div id="history-list" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 300px; overflow-y: auto; padding-right: 0.25rem;">
+                        <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1rem 0;">No saved batches in history.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Results Dashboard -->
+            <section class="results-container" aria-label="Calculated Results Dashboard">
+                
+                <!-- Hero Primary Metrics -->
+                <div class="hero-result-card">
+                    <div class="hero-layout">
+                        <div>
+                            <p class="hero-main-title">Final Rice Cost (Total)</p>
+                            <div class="hero-price" id="final-rice-cost">৳0.00</div>
+                            <p class="hero-price-sub">Sourcing + Opex - By-product Sales</p>
+                        </div>
+                        <div class="hero-divider"></div>
+                        <div class="hero-stat">
+                            <p class="hero-stat-label">Final Cost per Bag</p>
+                            <div class="hero-stat-value blue" id="final-cost-per-bag">৳0.00</div>
+                            <p class="hero-price-sub" id="final-cost-per-bag-sub">Per 50kg bag</p>
+                        </div>
+                        <div class="hero-stat">
+                            <p class="hero-stat-label">Final Cost per KG</p>
+                            <div class="hero-stat-value green" id="final-cost-per-kg">৳0.00</div>
+                            <p class="hero-price-sub">Net per kilogram</p>
+                        </div>
+                        <div class="hero-stat">
+                            <p class="hero-stat-label">Sorting Cost per Bag</p>
+                            <div class="hero-stat-value purple" id="sorting-cost-per-bag-hero">৳0.00</div>
+                            <p class="hero-price-sub">Milling difference</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI Intermediate Metrics -->
+                <div class="kpi-row">
+                    <div class="kpi-card sourcing">
+                        <span class="kpi-label">Sourcing Cost</span>
+                        <span class="kpi-value" id="kpi-sourcing">৳0.00</span>
+                        <span class="kpi-sub-value" id="kpi-sourcing-sub" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Excl. Loose: ৳0.00</span>
+                    </div>
+                    <div class="kpi-card operational">
+                        <span class="kpi-label">Operational Cost</span>
+                        <span class="kpi-value" id="kpi-operational">৳0.00</span>
+                    </div>
+                    <div class="kpi-card byproduct">
+                        <span class="kpi-label">By-Product Revenue</span>
+                        <span class="kpi-value" id="kpi-byproduct">৳0.00</span>
+                    </div>
+                </div>
+
+                <!-- Mass Balance & Yield Card -->
+                <div class="card" style="margin-top: 1.5rem; margin-bottom: 1.5rem;">
+                    <h2 class="card-title">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                        </svg>
+                        Mass Balance & Process Yield
+                    </h2>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; text-align: center; margin-top: 1rem;">
+                        <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                            <span style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Total Input Weight</span>
+                            <div id="yield-total-input" style="font-size: 1.5rem; font-weight: 800; color: #60a5fa; margin-top: 0.5rem;">0.00 kg</div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Sourced Raw Materials</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                            <span style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Total Output Weight</span>
+                            <div id="yield-total-output" style="font-size: 1.5rem; font-weight: 800; color: #34d399; margin-top: 0.5rem;">0.00 kg</div>
+                            <span id="yield-breakdown-sub" style="font-size: 0.75rem; color: var(--text-muted);">Main Rice + By-products</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                            <span style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Process Recovery %</span>
+                            <div id="yield-recovery-pct" style="font-size: 1.5rem; font-weight: 800; color: #fbbf24; margin-top: 0.5rem;">0.00%</div>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Output / Input ratio</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Costs breakdown Card -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        Financial Balance Sheet
+                    </h2>
+                    
+                    <div class="table-container">
+                        <table id="balance-sheet">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Item Details</th>
+                                    <th>Calculation basis</th>
+                                    <th style="text-align: right;">Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="balance-sheet-body">
+                                <!-- Generated Dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Visual Charts Panel -->
+                <div class="visual-panel">
+                    <!-- Cost Distribution (Donut Chart) -->
+                    <div class="card chart-card">
+                        <h3 class="card-title">Cost Composition</h3>
+                        <div class="donut-chart-wrapper">
+                            <svg class="donut-svg" width="160" height="160" viewBox="0 0 160 160">
+                                <circle class="donut-ring" cx="80" cy="80" r="65"></circle>
+                                
+                                <circle class="donut-segment" id="segment-sourcing" cx="80" cy="80" r="65" 
+                                        stroke="var(--primary)" stroke-dasharray="0 408" stroke-dashoffset="0"></circle>
+                                <circle class="donut-segment" id="segment-operational" cx="80" cy="80" r="65" 
+                                        stroke="var(--warning)" stroke-dasharray="0 408" stroke-dashoffset="0"></circle>
+                            </svg>
+                            <div class="donut-text">
+                                <span class="donut-text-value" id="gross-cost-text">৳0.00</span>
+                                <span class="donut-text-label">Gross Cost</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Offsets Analysis -->
+                    <div class="card chart-card">
+                        <h3 class="card-title">Recovery & Offsets</h3>
+                        <div class="bar-chart-container">
+                            <div class="bar-row">
+                                <div class="bar-info">
+                                    <span>Gross Cost Sourced</span>
+                                    <span id="bar-pct-sourcing">0%</span>
+                                </div>
+                                <div class="bar-track">
+                                    <div class="bar-fill sourcing" id="bar-fill-sourcing" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="bar-row">
+                                <div class="bar-info">
+                                    <span>Milling Expenses</span>
+                                    <span id="bar-pct-operational">0%</span>
+                                </div>
+                                <div class="bar-track">
+                                    <div class="bar-fill operational" id="bar-fill-operational" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="bar-row">
+                                <div class="bar-info">
+                                    <span>By-Product Offset</span>
+                                    <span id="bar-pct-byproduct">0%</span>
+                                </div>
+                                <div class="bar-track">
+                                    <div class="bar-fill byproduct" id="bar-fill-byproduct" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informational Note -->
+                <div class="info-note">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <strong>Interpretation Note:</strong> Sourcing raw materials comprises the largest portion of costs. Selling by-products (Khud, Mora, Mota, Grader, Loose Stock) recovers a portion of the expenditure, reducing the net cost of the main product. Under standard parameters, by-product "Loose Stock" priced at ৳5,000 per unit is assumed to represent 1 bag (50kg), translating to ৳100 per kg, which matches the sourcing price of loose stock. If you toggle this standard off, it calculates "Loose Stock" by-product revenue per kg (yielding ৳280,000 revenue) which dramatically offsets costs.
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Custom Modal for Batch Name Prompt -->
+        <div id="save-batch-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; transition: opacity var(--transition-fast);">
+            <div class="card" style="width: 100%; max-width: 450px; padding: 2rem; border: 1.5px solid rgba(99, 102, 241, 0.25); box-shadow: var(--shadow-lg); text-align: left;">
+                <h3 class="card-title" style="border-bottom: none; margin-bottom: 0.75rem;">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    Save Batch Run
+                </h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">Provide a descriptive label for this run configuration to access it later.</p>
+                <div class="input-group" style="margin-bottom: 1.5rem;">
+                    <label for="batch-name-input">Batch Name</label>
+                    <input type="text" id="batch-name-input" placeholder="e.g. Batch Run - 12:42 PM">
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <button type="button" class="btn-primary" id="confirm-save-btn" style="flex: 1;">Save Configuration</button>
+                    <button type="button" id="cancel-save-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.75rem 1.5rem; border-radius: var(--border-radius-sm); cursor: pointer; flex: 1; font-family: var(--font-sans); font-weight: 600; text-align: center; transition: all var(--transition-fast);">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Rice Milling cost and yield sheet. Premium Analytical Tool.</p>
+        </footer>
+    </div>
+
+    <!-- Script logic -->
+    <script src="app.js"></script>
+</body>
+</html>

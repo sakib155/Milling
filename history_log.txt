@@ -1,0 +1,43 @@
+=== Batch: Test Batch (Saved at 2026-06-11 12:59:17) ===
+  Total Input Sourcing Qty: 22,300.4 kg
+  Total Output Qty        : 22,275.0 kg
+  Process Recovery Ratio  : 99.89%
+  Final Rice Net Cost     : TK 2,601,835.00
+  Final Cost per Bag      : TK 6,239.41
+  Avg Sourcing per Raw Bag: TK 5,901.52
+  Sorting Cost per Bag    : TK 337.90
+  Final Cost per KG       : TK 124.79
+==============================================
+
+=== Batch: Standard Milling Batch CLI (Saved at 2026-06-11 13:27:32) ===
+  [Configuration]
+    Standard Bag Weight     : 50.0 kg
+  [Sourcing Data]
+    - Category 90             : 230.0 x 50.0 kg @ TK 5,445.00 (TK 1,252,350.00)
+    - Tulshi B Batch          : 20.0 x 50.0 kg @ TK 6,000.00 (TK 120,000.00)
+    - Tulshi A Batch          : 183.0 x 52.8 kg @ TK 6,795.00 (TK 1,243,485.00)
+    - Loose Stock             : 138.0 x 1.0 kg @ TK 100.00 (TK 13,800.00)
+  [Operational Expenses]
+    - Crushing Bill           : TK 28,250.00
+    - Chala Bill              : TK 9,600.00
+    - Flavour                 : TK 7,000.00
+    - Vehicle (Transport)     : TK 4,130.00
+  [By-products Recovery]
+    - Khud                    : 625.0 kg (12.50 x 50.0 kg) @ TK 1,500.00 (-TK 18,750.00)
+    - Mora                    : 235.0 kg (4.70 x 50.0 kg) @ TK 1,300.00 (-TK 6,110.00)
+    - Mota                    : 246.0 kg (4.92 x 50.0 kg) @ TK 3,000.00 (-TK 14,760.00)
+    - Grader                  : 263.0 kg (5.26 x 50.0 kg) @ TK 6,000.00 (-TK 31,560.00)
+    - Loose Stock             : 56.0 kg (1.12 x 50.0 kg) @ TK 5,000.00 (-TK 5,600.00)
+  [Main Product Output]
+    - Rice                  : 417 bags (20,850 kg)
+  [Process Yield & Costs Summary]
+    Total Input Sourcing Qty: 22,300.4 kg
+    Total Output Qty        : 22,275.0 kg
+    Process Recovery Ratio  : 99.89%
+    Final Rice Net Cost     : TK 2,601,835.00
+    Final Cost per Bag      : TK 6,239.41
+    Avg Sourcing per Raw Bag: TK 5,901.52
+    Sorting Cost per Bag    : TK 337.90
+    Final Cost per KG       : TK 124.79
+==============================================
+
